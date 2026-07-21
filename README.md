@@ -51,16 +51,17 @@ limpios y normalizados (fechas a formato ISO, separar cliente de sujeto OFAC).
 5. **Reportar** (`main.py` + `cost.py`) — escribe el CSV y muestra el log en vivo con tiempo
    y costo.
 
-### El principio no negociable
+### Qué NO usa el agente para decidir
 
-El documento del regulador trae dos números que son **señuelos** y el agente **ignora** al
-decidir (aunque los guarda en el CSV para mostrar que fue una decisión, no un olvido):
+El documento trae dos números que el agente registra en el CSV pero deja fuera de la decisión,
+a propósito:
 
-- el **score del motor de screening** — mide parecido de *nombre*, no identidad. En el
-  ejemplo hay un falso positivo con **97 %** de score y una coincidencia real con **81 %**;
-- el **nivel de riesgo interno de la cuenta** — califica a la *cuenta*, no a la coincidencia.
+- el *score del motor de screening*: mide cuánto se parecen los nombres, no si son la misma
+  persona. En el ejemplo hay un falso positivo con score 97 % y una coincidencia real con 81 %.
+- el *nivel de riesgo interno de la cuenta*: describe a la cuenta, no a la coincidencia.
 
-Clasificar por el score sería hacer, en varios casos, exactamente lo contrario de lo correcto.
+Decidir por el score llevaría, en varios casos, a la conclusión contraria a la correcta. Por eso
+el agente los guarda (para dejar constancia de que los vio) pero razona sobre los identificadores.
 
 ---
 
@@ -199,14 +200,14 @@ casos y la lógica de clasificación, sin llamar a la API (cero costo).
 
 ---
 
-## Supuestos (documentados, no preguntados)
+## Supuestos
 
-- **Idioma → español.** Todo el material del challenge vino en español y el usuario final es
-  un analista de compliance argentino.
-- **Proveedor → Claude (Anthropic).** El challenge pide un agente en Strands pero no obliga
-  proveedor; se eligió Claude por calidad de extracción sobre prosa irregular. El modelo por
-  defecto es Haiku (una corrida de las 80 observaciones cuesta centavos).
-- Cada quien corre el agente con **su propia** API key (va en `.env`, nunca en el repo).
+- **Idioma → español**, porque el usuario final es un analista de compliance argentino: el CSV,
+  las justificaciones y este README están en español.
+- **Proveedor → Claude (Anthropic).** El agente se construye con Strands, que no obliga a un
+  proveedor; se eligió Claude por su calidad extrayendo datos de prosa irregular. El modelo por
+  defecto es Haiku 4.5 (una corrida de las 80 observaciones cuesta centavos).
+- Cada quien corre el agente con su propia API key (va en `.env`, nunca en el repo).
 
 ---
 
