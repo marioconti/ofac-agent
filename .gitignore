@@ -1,0 +1,9 @@
+# Python virtual environment
+.venv/
+
+# Byte-compiled / cache
+__pycache__/
+*.pyc
+
+# Secrets — never commit the real key
+.env

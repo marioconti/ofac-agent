@@ -1,0 +1,6 @@
+# Direct dependencies. Pinned to the versions the agent was built and tested against.
+strands-agents[anthropic]==1.48.0   # the agent framework (pulls in the anthropic SDK)
+pdfplumber==0.11.10                  # PDF text extraction (handles subset-embedded fonts)
+python-docx==1.2.0                   # Word (.docx) text extraction — the report may arrive as Word
+pydantic==2.13.4                     # the structured-output schema the LLM fills in
+python-dotenv==1.2.2                 # reads the API key from .env
