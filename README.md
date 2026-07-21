@@ -110,7 +110,7 @@ costo total y la duración.
 Ejemplo de log en vivo:
 
 ```
-[ 5/80] Obs. 5   Pedro David Gallón Henao   → FALSO POSITIVO  (baja ) · R4 · USD 0.0043
+[ 5/80] Obs. 5   Pedro David Gallón Henao   → FALSO POSITIVO  (baja ) · R4 ·  1.7s · USD 0.0043
 ...
 ==============================================================
   RESUMEN DE LA CORRIDA — 80 observaciones procesadas

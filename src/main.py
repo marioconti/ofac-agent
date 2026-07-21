@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import csv
 import sys
+import time
 from pathlib import Path
 
 from .classifier import classify
@@ -190,21 +191,27 @@ def main(argv: list[str] | None = None) -> int:
     total = len(observations)
 
     for index, (number, raw_text) in enumerate(observations, start=1):
+        case_start = time.perf_counter()
         try:
             observation, metrics = extract_one(raw_text, model)
             usage = metrics.accumulated_usage
             call_cost = run.add(usage["inputTokens"], usage["outputTokens"])
             verdict = classify(observation)
             rows.append(_row(number, observation, verdict))
+            elapsed = time.perf_counter() - case_start
             print(
                 f"[{index:>2}/{total}] Obs. {number:<3} {observation.client_name[:34]:<34} "
                 f"→ {verdict.classification.upper():<26} ({verdict.priority:<5}) "
-                f"· {verdict.rule.split(' ·')[0]:<4} · USD {call_cost:.4f}"
+                f"· {verdict.rule.split(' ·')[0]:<4} · {elapsed:4.1f}s · USD {call_cost:.4f}"
             )
         except Exception as error:
             # One bad observation must not take the run down with it.
+            elapsed = time.perf_counter() - case_start
             rows.append(_error_row(number, f"{type(error).__name__}: {error}"))
-            print(f"[{index:>2}/{total}] Obs. {number:<3} → ERROR DE EXTRACCIÓN ({type(error).__name__}) — se continúa")
+            print(
+                f"[{index:>2}/{total}] Obs. {number:<3} → ERROR DE EXTRACCIÓN "
+                f"({type(error).__name__}) · {elapsed:4.1f}s — se continúa"
+            )
 
     output = Path(args.output)
     _write_csv(output, rows)
