@@ -213,6 +213,10 @@ caso activa dos reglas, gana la señal más fuerte.
 8. Nombre parcial sin nada que lo confirme → **falso positivo, baja**.
 9. El nombre casi no coincide y no hay identificadores → **falso positivo, baja**.
 
+*Programa severo* (reglas 6 y 7) es el motivo por el que el sujeto está en la lista de OFAC
+cuando es de los más graves (terrorismo `[SDGT]`, narcotráfico `[SDNTK]`). Ante una duda genuina,
+esos casos suben a **alta** prioridad, porque el costo de dejar pasar un match real es máximo.
+
 El detalle y el porqué de cada regla están comentados en `src/classifier.py`, y el proceso de
 cómo se llegó a este criterio (con evidencia de cada corrida) está en
 [`ITERACIONES.md`](ITERACIONES.md).
