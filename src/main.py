@@ -120,7 +120,7 @@ def _summary(rows: list[dict], run: RunCost, model_id: str) -> None:
 
     print()
     print("=" * 62)
-    print(f"  RESUMEN DE LA CORRIDA — {total} observaciones procesadas")
+    print(f"  RESUMEN DE LA CORRIDA: {total} observaciones procesadas")
     print("=" * 62)
     print(f"  Falsos positivos ........ {len(false_positive):>3}")
     print(f"  Posibles reales ......... {len(real):>3}")
@@ -210,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
             rows.append(_error_row(number, f"{type(error).__name__}: {error}"))
             print(
                 f"[{index:>2}/{total}] Obs. {number:<3} → ERROR DE EXTRACCIÓN "
-                f"({type(error).__name__}) · {elapsed:4.1f}s — se continúa"
+                f"({type(error).__name__}) · {elapsed:4.1f}s · se continúa"
             )
 
     output = Path(args.output)

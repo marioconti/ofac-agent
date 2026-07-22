@@ -23,32 +23,51 @@ solo con el de ejemplo.
 > El modelo de lenguaje **lee y extrae**; reglas explícitas en Python **deciden**.
 
 El screening por nombre genera muchísimos falsos positivos (homónimos). El trabajo no es
-volver a matchear el nombre —eso ya lo hizo el regulador— sino **correlacionar los
+volver a matchear el nombre (eso ya lo hizo el regulador), sino **correlacionar los
 identificadores** (fecha de nacimiento, documento, nacionalidad, lugar de nacimiento) para
 decidir si es la misma persona, y con qué urgencia hay que revisarla.
 
 Ese juicio lo toma un **árbol de reglas determinista**, no el modelo. Así la decisión es:
 
-- **auditable** — la justificación cita las señales concretas que la fundaron;
-- **reproducible** — mismos datos, mismo resultado, siempre;
-- **explicable** — cada fila del CSV indica qué regla la produjo.
+- **auditable**: la justificación cita las señales concretas que la fundaron.
+- **reproducible**: mismos datos, mismo resultado, siempre.
+- **explicable**: cada fila del CSV indica qué regla la produjo.
 
 El modelo se usa **solo** para lo que hace bien: convertir la prosa desordenada en campos
 limpios y normalizados (fechas a formato ISO, separar cliente de sujeto OFAC).
 
 ### El pipeline, en pasos
 
-1. **Segmentar** (`loader.py`, sin modelo) — extrae el texto del documento y lo corta en
+```mermaid
+flowchart TD
+    IN([Documento del regulador: PDF o Word<br/>80 observaciones en prosa])
+    IN --> L["1 · loader.py (sin IA)<br/>lee el texto y lo corta en 80 observaciones"]
+    L --> LOOP{{Por cada observación}}
+    LOOP --> E["2 · extractor.py (agente Strands, LLM)<br/>extrae los datos del cliente y del sancionado"]
+    E --> C["3 · classifier.py (sin IA, reglas)<br/>compara los identificadores, árbol de 9 reglas:<br/>clasificación + prioridad"]
+    C --> J["4 · justifier.py (sin IA)<br/>arma la frase que cita las señales"]
+    J --> M["5 · main.py (sin IA)<br/>escribe la fila del CSV y loguea tiempo y costo"]
+    M -.->|siguiente| LOOP
+    M --> OUT([resultado.csv: 80 casos clasificados,<br/>priorizados y justificados])
+    classDef ia fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
+    classDef reglas fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef io fill:#fef3c7,stroke:#d97706,color:#713f12
+    class E ia
+    class L,C,J,M reglas
+    class IN,OUT io
+```
+
+1. **Segmentar** (`loader.py`, sin modelo): extrae el texto del documento y lo corta en
    observaciones. El delimitador de cada caso varía ("Obs. 1", "Observación 2:", "Ítem 3.",
    "Caso 4", "Observación N.º 5"); se detecta con un patrón flexible, sin asumir una cantidad
    fija de observaciones.
-2. **Extraer** (`extractor.py`, el agente en Strands) — cada observación → un formulario
-   estructurado (`schema.py`) con los datos del cliente y del sujeto OFAC. El modelo **no
-   clasifica**: solo lee y normaliza.
-3. **Clasificar y priorizar** (`classifier.py`, reglas deterministas) — compara los
+2. **Extraer** (`extractor.py`, el agente en Strands): cada observación se convierte en un
+   formulario estructurado (`schema.py`) con los datos del cliente y del sujeto OFAC. El modelo
+   **no clasifica**: solo lee y normaliza.
+3. **Clasificar y priorizar** (`classifier.py`, reglas deterministas): compara los
    identificadores señal por señal y aplica un árbol de decisión explícito.
-4. **Justificar** (`justifier.py`) — arma la frase legible citando las señales.
-5. **Reportar** (`main.py` + `cost.py`) — escribe el CSV y muestra el log en vivo con tiempo
+4. **Justificar** (`justifier.py`): arma la frase legible citando las señales.
+5. **Reportar** (`main.py` + `cost.py`): escribe el CSV y muestra el log en vivo con tiempo
    y costo.
 
 ### Qué NO usa el agente para decidir
@@ -114,7 +133,7 @@ Ejemplo de log en vivo:
 [ 5/80] Obs. 5   Pedro David Gallón Henao   → FALSO POSITIVO  (baja ) · R4 ·  1.7s · USD 0.0043
 ...
 ==============================================================
-  RESUMEN DE LA CORRIDA — 80 observaciones procesadas
+  RESUMEN DE LA CORRIDA: 80 observaciones procesadas
   Falsos positivos ........  55
   Posibles reales .........  25
   Prioridad alta ..........  25   <- revisar primero
@@ -135,14 +154,14 @@ la evidencia, y al final los datos crudos.
 |---|---|
 | `n_observacion` | Número de la observación en el informe. |
 | `clasificacion` | `falso positivo` / `posible coincidencia real` (o `ERROR_DE_EXTRACCION`). |
-| `prioridad` | `baja` / `media` / `alta` — qué tan urgente es la revisión humana. |
+| `prioridad` | `baja` / `media` / `alta`, según la urgencia de la revisión humana. |
 | `justificacion` | Frase legible que cita las señales concretas de la decisión. |
 | `datos_insuficientes` | `sí` si no había identificadores para confirmar o descartar. |
 | `senales_detectadas` | Cada identificador comparado y su estado (confirma / contradice / sin dato). |
 | `regla_aplicada` | La regla exacta del árbol que produjo la decisión (trazabilidad). |
 | `coincidencia_nombre` | Fuerza del match de nombre (exacto / contenido / parcial / débil). |
 | `cliente_*` / `ofac_*` | Datos estructurados del cliente y del sujeto OFAC. |
-| `score_motor_no_usado` / `riesgo_interno_no_usado` | Los señuelos — se registran pero **no** se usan para decidir. |
+| `score_motor_no_usado` / `riesgo_interno_no_usado` | Los señuelos: se registran pero **no** se usan para decidir. |
 
 Se escribe en UTF-8 con BOM para que Excel muestre bien los acentos.
 
@@ -155,9 +174,9 @@ En `output/resultado.csv` está el CSV generado a partir del documento de ejempl
 Cada identificador se compara y cae en **confirma**, **contradice** o **sin dato**. No todos
 pesan igual:
 
-- **fuertes** (discriminantes): **documento** y **fecha de nacimiento** — dos personas con el
-  mismo nombre casi nunca comparten uno de estos por azar;
-- **de apoyo** (débiles): **nacionalidad** y **lugar de nacimiento** — solo acotan el universo
+- **fuertes** (discriminantes): **documento** y **fecha de nacimiento**, porque dos personas con
+  el mismo nombre casi nunca comparten uno de estos por azar.
+- **de apoyo** (débiles): **nacionalidad** y **lugar de nacimiento**, que solo acotan el universo
   (medio país comparte una nacionalidad).
 
 El árbol de decisión, en orden (la primera regla que aplica decide):
