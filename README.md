@@ -110,15 +110,23 @@ copy .env.example .env            # Windows  (cp en macOS / Linux)
 # editar .env y pegar tu clave:  ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-La API key se saca de <https://console.anthropic.com> (es la API de Anthropic, distinta de
-la suscripción de chat). El archivo `.env` está en `.gitignore`: la clave nunca se sube.
+La API key se obtiene en <https://console.anthropic.com>. El `.env` está en `.gitignore`, así
+que la clave nunca se versiona en el repo.
 
 ---
 
 ## Uso
 
+Contra el documento de ejemplo incluido en el repo:
+
 ```bash
 python -m src.main input/observaciones-ejemplo.pdf
+```
+
+Contra cualquier otro documento del mismo formato (PDF o Word):
+
+```bash
+python -m src.main /ruta/a/otro-documento.pdf
 ```
 
 Opciones:
