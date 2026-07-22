@@ -235,8 +235,8 @@ El agente tiene que correr contra **otro** documento del mismo formato sin rompe
   contradicción; se marca para que un humano lo mire.
 - **Una observación que no se puede extraer** → se registra como `ERROR_DE_EXTRACCION` y la
   corrida **continúa**; nunca se pierde silenciosamente un caso.
-- **Cantidad de observaciones distinta a 80, o numeración con huecos** → se respeta lo que el
-  documento traiga.
+- **Cualquier cantidad de observaciones, o numeración con huecos**: el sistema procesa las que
+  el documento traiga, sin asumir un número fijo.
 - **Encoding** → todo en UTF-8, forzado también en la consola de Windows.
 
 Los tests (`python -m tests.test_classifier` y `python -m tests.test_loader`) cubren estos
