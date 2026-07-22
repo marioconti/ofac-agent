@@ -170,7 +170,7 @@ la evidencia, y al final los datos crudos.
 | `clasificacion` | `falso positivo` / `posible coincidencia real` (o `ERROR_DE_EXTRACCION`). |
 | `prioridad` | `baja` / `media` / `alta`, según la urgencia de la revisión humana. |
 | `justificacion` | Frase legible que cita las señales concretas de la decisión. |
-| `datos_insuficientes` | `sí` si no había identificadores para confirmar o descartar. |
+| `datos_insuficientes` | Vale `sí` cuando no hay identificadores secundarios para confirmar ni descartar el match. |
 | `senales_detectadas` | Cada identificador comparado y su estado (confirma / contradice / sin dato). |
 | `regla_aplicada` | La regla exacta del árbol que produjo la decisión (trazabilidad). |
 | `coincidencia_nombre` | Fuerza del match de nombre (exacto / contenido / parcial / débil). |
