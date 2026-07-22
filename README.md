@@ -39,16 +39,15 @@ limpios y normalizados (fechas a formato ISO, separar cliente de sujeto OFAC).
 ### El pipeline, en pasos
 
 ```mermaid
-flowchart TD
-    IN([Documento del regulador: PDF o Word<br/>80 observaciones en prosa])
-    IN --> L["1 · loader.py (sin IA)<br/>lee el texto y lo corta en 80 observaciones"]
-    L --> LOOP{{Por cada observación}}
-    LOOP --> E["2 · extractor.py (agente Strands, LLM)<br/>extrae los datos del cliente y del sancionado"]
-    E --> C["3 · classifier.py (sin IA, reglas)<br/>compara los identificadores, árbol de 9 reglas:<br/>clasificación + prioridad"]
-    C --> J["4 · justifier.py (sin IA)<br/>arma la frase que cita las señales"]
-    J --> M["5 · main.py (sin IA)<br/>escribe la fila del CSV y loguea tiempo y costo"]
+flowchart LR
+    IN([Documento<br/>PDF o Word]) --> L["1 · loader<br/>sin IA<br/>corta en observaciones"]
+    L --> LOOP{{por cada<br/>observación}}
+    LOOP --> E["2 · extractor<br/>Strands / LLM<br/>extrae los datos"]
+    E --> C["3 · classifier<br/>reglas · sin IA<br/>clasifica + prioriza"]
+    C --> J["4 · justifier<br/>sin IA<br/>justifica"]
+    J --> M["5 · main<br/>sin IA<br/>CSV + log"]
     M -.->|siguiente| LOOP
-    M --> OUT([resultado.csv: 80 casos clasificados,<br/>priorizados y justificados])
+    M --> OUT([resultado.csv<br/>clasificado, priorizado<br/>y justificado])
     classDef ia fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
     classDef reglas fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef io fill:#fef3c7,stroke:#d97706,color:#713f12
@@ -225,7 +224,7 @@ casos y la lógica de clasificación, sin llamar a la API (cero costo).
   las justificaciones y este README están en español.
 - **Proveedor → Claude (Anthropic).** El agente se construye con Strands, que no obliga a un
   proveedor; se eligió Claude por su calidad extrayendo datos de prosa irregular. El modelo por
-  defecto es Haiku 4.5 (una corrida de las 80 observaciones cuesta centavos).
+  defecto es Haiku 4.5 (una corrida completa cuesta centavos).
 - Cada quien corre el agente con su propia API key (va en `.env`, nunca en el repo).
 
 ---
