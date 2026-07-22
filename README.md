@@ -75,15 +75,18 @@ flowchart TD
 
 ### Qué NO usa el agente para decidir
 
-El documento trae dos números que el agente registra en el CSV pero deja fuera de la decisión,
-a propósito:
+Algunas observaciones incluyen dos números que el banco ya había calculado. El agente los extrae
+y los registra en el CSV, pero los **deja fuera de la decisión**, a propósito:
 
-- el *score del motor de screening*: mide cuánto se parecen los nombres, no si son la misma
-  persona. En el ejemplo hay un falso positivo con score 97 % y una coincidencia real con 81 %.
-- el *nivel de riesgo interno de la cuenta*: describe a la cuenta, no a la coincidencia.
+- el **score del motor de screening** (el porcentaje que el sistema del banco le asignó al match
+  al detectarlo): mide cuánto se parecen los *nombres*, no si son la misma persona. En el ejemplo
+  hay un falso positivo con score 97 % y una coincidencia real con 81 %.
+- el **nivel de riesgo interno de la cuenta**: una calificación que el banco le da a la *cuenta*
+  (por su historial y movimientos), no a la coincidencia contra la lista.
 
-Decidir por el score llevaría, en varios casos, a la conclusión contraria a la correcta. Por eso
-el agente los guarda (para dejar constancia de que los vio) pero razona sobre los identificadores.
+Ninguno de los dos dice si el cliente es realmente la persona sancionada. Clasificar por el score
+llevaría, en varios casos, a la conclusión contraria a la correcta. Por eso el agente los guarda
+(para dejar constancia de que los vio) pero decide sobre los identificadores.
 
 ---
 
@@ -93,7 +96,7 @@ Requiere **Python 3.11+**.
 
 ```bash
 # 1. Clonar y entrar al repo
-git clone <url-del-repo>
+git clone https://github.com/marioconti/ofac-agent.git
 cd ofac-agent
 
 # 2. Crear el entorno virtual e instalar dependencias
