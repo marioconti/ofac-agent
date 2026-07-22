@@ -193,12 +193,19 @@ pesan igual:
 - **de apoyo** (débiles): **nacionalidad** y **lugar de nacimiento**, que solo acotan el universo
   (medio país comparte una nacionalidad).
 
-El árbol de decisión, en orden (la primera regla que aplica decide):
+Las reglas siguen la guía de OFAC para evaluar coincidencias (su FAQ 5: comparar la entrada
+completa, no solo el nombre, y preguntarse si el tipo de entidad difiere, si coincide un solo
+nombre, si hay varios identificadores en común).
+
+**El orden importa** y no es por prioridad, sino por **certeza**: la primera regla que aplica
+decide, y van de la más determinante (una conclusión casi segura) a la más ambigua. Así, si un
+caso activa dos reglas, gana la señal más fuerte.
 
 1. El registro OFAC no es una persona (es un buque/empresa) → **falso positivo, baja**.
 2. El match se apoya solo en un alias marcado como débil → **falso positivo, baja**.
 3. Coincide el **número de documento** → **posible real, alta** (identificador casi determinante).
-4. Un identificador **fuerte contradice** y ninguno confirma → **falso positivo, baja** (homónimo).
+4. Un identificador **fuerte no coincide** (p. ej. distinta fecha de nacimiento) y ninguno
+   confirma → **falso positivo, baja**: mismo nombre, otra persona (homónimo).
 5. **Dos o más** identificadores fuertes coinciden → **posible real, alta**.
 6. **Un** identificador fuerte coincide → **posible real, media** (alta si el programa es severo).
 7. Nombre fuerte pero **sin** identificadores para verificar → **posible real, media** +
