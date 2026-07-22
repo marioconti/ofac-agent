@@ -39,15 +39,15 @@ limpios y normalizados (fechas a formato ISO, separar cliente de sujeto OFAC).
 ### El pipeline, en pasos
 
 ```mermaid
-flowchart LR
-    IN([Documento<br/>PDF o Word]) --> L["1 · loader<br/>sin IA<br/>corta en observaciones"]
-    L --> LOOP{{por cada<br/>observación}}
-    LOOP --> E["2 · extractor<br/>Strands / LLM<br/>extrae los datos"]
-    E --> C["3 · classifier<br/>reglas · sin IA<br/>clasifica + prioriza"]
-    C --> J["4 · justifier<br/>sin IA<br/>justifica"]
-    J --> M["5 · main<br/>sin IA<br/>CSV + log"]
+flowchart TD
+    IN([Documento: PDF o Word]) --> L["1 · loader (sin IA)<br/>corta en observaciones"]
+    L --> LOOP{{por cada observación}}
+    LOOP --> E["2 · extractor (Strands / LLM)<br/>extrae los datos"]
+    E --> C["3 · classifier (reglas, sin IA)<br/>clasifica y prioriza"]
+    C --> J["4 · justifier (sin IA)<br/>arma la justificación"]
+    J --> M["5 · main (sin IA)<br/>escribe el CSV y loguea tiempo/costo"]
     M -.->|siguiente| LOOP
-    M --> OUT([resultado.csv<br/>clasificado, priorizado<br/>y justificado])
+    M --> OUT([resultado.csv: clasificado,<br/>priorizado y justificado])
     classDef ia fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
     classDef reglas fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef io fill:#fef3c7,stroke:#d97706,color:#713f12
