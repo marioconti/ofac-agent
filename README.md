@@ -33,19 +33,23 @@ Ese juicio lo toma un **árbol de reglas determinista**, no el modelo. Así la d
 - **reproducible**: mismos datos, mismo resultado, siempre.
 - **explicable**: cada fila del CSV indica qué regla la produjo.
 
-El modelo se usa **solo** para lo que hace bien: convertir la prosa desordenada en campos
-limpios y normalizados (fechas a formato ISO, separar cliente de sujeto OFAC).
+El modelo se usa **solo** para lo que hace bien: leer cada observación (que viene en prosa,
+con los datos del cliente y del sancionado mezclados) y ordenar esos datos en campos separados,
+los del cliente por un lado y los del sujeto OFAC por otro, con las fechas en un formato
+uniforme. **No toma ninguna decisión**: eso queda para las reglas.
 
 ### El pipeline, en pasos
 
+*El paso en azul es el único que usa el modelo de IA; los verdes son Python puro.*
+
 ```mermaid
 flowchart TD
-    IN([Documento: PDF o Word]) --> L["1 · loader (sin IA)<br/>corta en observaciones"]
+    IN([Documento: PDF o Word]) --> L["1 · loader<br/>corta en observaciones"]
     L --> LOOP{{por cada observación}}
-    LOOP --> E["2 · extractor (Strands / LLM)<br/>extrae los datos"]
-    E --> C["3 · classifier (reglas, sin IA)<br/>clasifica y prioriza"]
-    C --> J["4 · justifier (sin IA)<br/>arma la justificación"]
-    J --> M["5 · main (sin IA)<br/>escribe el CSV y loguea tiempo/costo"]
+    LOOP --> E["2 · extractor (usa el LLM)<br/>extrae los datos"]
+    E --> C["3 · classifier<br/>clasifica y prioriza"]
+    C --> J["4 · justifier<br/>arma la justificación"]
+    J --> M["5 · main<br/>escribe el CSV y loguea tiempo/costo"]
     M -.->|siguiente| LOOP
     M --> OUT([resultado.csv: clasificado,<br/>priorizado y justificado])
     classDef ia fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
